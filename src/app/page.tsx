@@ -118,8 +118,8 @@ export default function Home() {
   return (
     <>
       <Modal status={modalStatus} title="" closeModal={() => closeModal()}>
-        <div className="flex w-full space-y-10 max-lg:space-y-20 flex-col">
-          <div className="flex w-full flex-row space-x-2 h-full">
+        <div className="flex w-full space-y-10 max-sm:space-y-2 flex-col">
+          <div className="flex w-full flex-row max-md:flex-col space-x-2 ">
             <div className="flex justify-center h-full w-full">
               <img
                 className="w-auto"
@@ -131,22 +131,9 @@ export default function Home() {
               <span className="flex w-full justify-center">
                 {animeDetail?.data?.title}
               </span>
-              <span className="flex w-full space-y-2 text-wrap text-justify justify-center">
+              <span className="flex w-full px-2 max-md:p-0 space-y-2 text-justify justify-center">
                 {animeDetail?.data?.synopsis}
               </span>
-              {/* <span className="flex w-full justify-center">
-                {animeDetail?.data?.type}
-              </span>
-              <span className="flex w-full justify-center">
-                {animeDetail?.data?.status},{" "}
-                {moment(animeDetail?.data?.aired?.from).format("YYYY-MM-DD")} to{" "}
-                {animeDetail?.data?.aired?.to
-                  ? moment(animeDetail?.data?.aired?.from).format("YYYY-MM-DD")
-                  : "-"}
-              </span>
-              <span className="flex w-full justify-center">
-                {animeDetail?.data?.duration}
-              </span> */}
             </div>
           </div>
           <div className="flex w-full px-2">
@@ -178,9 +165,7 @@ export default function Home() {
                   {moment(animeDetail?.data?.aired?.from).format("YYYY-MM-DD")}{" "}
                   to{" "}
                   {animeDetail?.data?.aired?.to
-                    ? moment(animeDetail?.data?.aired?.from).format(
-                        "YYYY-MM-DD"
-                      )
+                    ? moment(animeDetail?.data?.aired?.to).format("YYYY-MM-DD")
                     : "-"}
                 </td>
               </tr>
@@ -417,7 +402,7 @@ export default function Home() {
                   <img
                     alt={i?.titles[0].title}
                     src={i?.images.jpg.image_url}
-                    className="w-48 max-sm:w-48 flex h-full"
+                    className="w-48 max-sm:w-36 flex h-full"
                   />
                   <span className=" text-center w-full h-full text-white p-1 absolute hidden bg-black bg-opacity-50 left-0 top-0 bottom-0 right-0">
                     {i?.title}
