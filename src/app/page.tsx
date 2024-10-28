@@ -1,7 +1,19 @@
 "use client";
+import Modal from "@/components/modal";
 import axios from "axios";
 import { useEffect, useState } from "react";
 import ReactSelect from "react-select";
+import {
+  limitValSelect,
+  orderValSelect,
+  ratingValSelect,
+  scoreValSelect,
+  sfwValSelect,
+  sortValSelect,
+  statusValSelect,
+  typeValSelect,
+} from "./helper/selectData";
+import moment from "moment";
 
 export default function Home() {
   const [animeData, setAnimeData] = useState<any>([]);
@@ -19,6 +31,8 @@ export default function Home() {
   const [score, setScore] = useState<string>("");
   const [maxScore, setMaxScore] = useState<string>("");
   const [minScore, setMinScore] = useState<string>("");
+  const [animeDetail, setAnimeDetail] = useState<any>([]);
+  const [modalStatus, setmodalStatus] = useState<boolean>(false);
 
   const getAnimeData = async () => {
     await axios
@@ -53,6 +67,19 @@ export default function Home() {
       });
   };
 
+  const getAnimeDetail = async (id: string) => {
+    await axios
+      .get(`https://api.jikan.moe/v4/anime/${id}/full`)
+      .then((res) => {
+        console.log("cek detail", res.data);
+        setAnimeDetail(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err);
+      });
+  };
+
   useEffect(() => {
     console.log("cek genreval", genreVal);
     getAnimeData();
@@ -69,212 +96,136 @@ export default function Home() {
     score,
     minScore,
     maxScore,
+    query,
   ]);
 
   useEffect(() => {
     getAnimeGenre();
   }, []);
 
-  const limitValSelect = [
-    {
-      value: 5,
-      label: 5,
-    },
-    {
-      value: 10,
-      label: 10,
-    },
-    {
-      value: 20,
-      label: 20,
-    },
-  ];
+  const closeModal = () => {
+    setmodalStatus(!modalStatus);
+    setAnimeDetail([]);
+  };
 
-  const statusValSelect = [
-    {
-      value: "airing",
-      label: "Airing",
-    },
-    {
-      value: "complete",
-      label: "Complete",
-    },
-    {
-      value: "upcoming",
-      label: "Upcoming",
-    },
-  ];
+  const openAnimeDetailModal = () => {};
 
-  const typeValSelect = [
-    {
-      value: "tv",
-      label: "TV",
-    },
-    {
-      value: "movie",
-      label: "Movie",
-    },
-    {
-      value: "ova",
-      label: "OVA",
-    },
-    {
-      value: "special",
-      label: "Special",
-    },
-    {
-      value: "ona",
-      label: "ONA",
-    },
-    {
-      value: "music",
-      label: "Music",
-    },
-    {
-      value: "cm",
-      label: "CM",
-    },
-    {
-      value: "pv",
-      label: "PV",
-    },
-    {
-      value: "tv_special",
-      label: "TV Special",
-    },
-  ];
-
-  const ratingValSelect = [
-    {
-      value: "g",
-      label: "G",
-    },
-    {
-      value: "pg",
-      label: "PG",
-    },
-    {
-      value: "pg13",
-      label: "PG-13",
-    },
-    {
-      value: "r17",
-      label: "PG-17+",
-    },
-    {
-      value: "r",
-      label: "R+",
-    },
-    {
-      value: "rx",
-      label: "Rx",
-    },
-  ];
-
-  const sfwValSelect = [
-    {
-      value: "true",
-      label: "True",
-    },
-    {
-      value: "false",
-      label: "False",
-    },
-  ];
-
-  const orderValSelect = [
-    {
-      value: "mal_id",
-      label: "ID",
-    },
-    {
-      value: "title",
-      label: "Title",
-    },
-    {
-      value: "start_date",
-      label: "Start Date",
-    },
-    {
-      value: "end_date",
-      label: "End Date",
-    },
-    {
-      value: "episodes",
-      label: "Episodes",
-    },
-    {
-      value: "score",
-      label: "Score",
-    },
-    {
-      value: "rank",
-      label: "Rank",
-    },
-    {
-      value: "popularity",
-      label: "Popularity",
-    },
-  ];
-
-  const sortValSelect = [
-    {
-      value: "asc",
-      label: "Ascending",
-    },
-    {
-      value: "desc",
-      label: "Descending",
-    },
-  ];
-
-  const scoreValSelect = [
-    {
-      value: "1",
-      label: "1",
-    },
-    {
-      value: "2",
-      label: "2",
-    },
-    {
-      value: "3",
-      label: "3",
-    },
-    {
-      value: "4",
-      label: "4",
-    },
-    {
-      value: "5",
-      label: "5",
-    },
-    {
-      value: "6",
-      label: "6",
-    },
-    {
-      value: "7",
-      label: "7",
-    },
-    {
-      value: "8",
-      label: "8",
-    },
-    {
-      value: "9",
-      label: "9",
-    },
-    {
-      value: "10",
-      label: "10",
-    },
-  ];
+  const openModalAnimeDetail = async (id: string) => {
+    await getAnimeDetail(id);
+    setmodalStatus(!modalStatus);
+  };
 
   return (
     <>
-      <div className="w-64 max-h-screen pt-20 overflow-auto flex">
-        <div className="flex justify-start w-full flex-col space-y-1 pl-1">
+      <Modal status={modalStatus} title="" closeModal={() => closeModal()}>
+        <div className="flex w-full space-y-10 max-lg:space-y-20 flex-col">
+          <div className="flex w-full flex-row space-x-2 h-full">
+            <div className="flex justify-center h-full w-full">
+              <img
+                className="w-auto"
+                alt={animeDetail?.data?.title}
+                src={animeDetail?.data?.images?.jpg?.large_image_url}
+              />
+            </div>
+            <div className="w-full flex space-y-2 flex-col items-center justify-center">
+              <span className="flex w-full justify-center">
+                {animeDetail?.data?.title}
+              </span>
+              <span className="flex w-full space-y-2 text-wrap text-justify justify-center">
+                {animeDetail?.data?.synopsis}
+              </span>
+              {/* <span className="flex w-full justify-center">
+                {animeDetail?.data?.type}
+              </span>
+              <span className="flex w-full justify-center">
+                {animeDetail?.data?.status},{" "}
+                {moment(animeDetail?.data?.aired?.from).format("YYYY-MM-DD")} to{" "}
+                {animeDetail?.data?.aired?.to
+                  ? moment(animeDetail?.data?.aired?.from).format("YYYY-MM-DD")
+                  : "-"}
+              </span>
+              <span className="flex w-full justify-center">
+                {animeDetail?.data?.duration}
+              </span> */}
+            </div>
+          </div>
+          <div className="flex w-full px-2">
+            <table className="table [&>*]:w-auto w-full  ">
+              <tr>
+                <td>Type</td>
+                <td>:</td>
+                <td>{animeDetail?.data?.type}</td>
+              </tr>
+              <tr>
+                <td>Source</td>
+                <td>:</td>
+                <td>{animeDetail?.data?.source}</td>
+              </tr>
+              <tr>
+                <td>Episodes</td>
+                <td>:</td>
+                <td>{animeDetail?.data?.episodes}</td>
+              </tr>
+              <tr>
+                <td>Status</td>
+                <td>:</td>
+                <td>{animeDetail?.data?.status}</td>
+              </tr>
+              <tr>
+                <td>Aired</td>
+                <td>:</td>
+                <td>
+                  {moment(animeDetail?.data?.aired?.from).format("YYYY-MM-DD")}{" "}
+                  to{" "}
+                  {animeDetail?.data?.aired?.to
+                    ? moment(animeDetail?.data?.aired?.from).format(
+                        "YYYY-MM-DD"
+                      )
+                    : "-"}
+                </td>
+              </tr>
+              <tr>
+                <td>Duration</td>
+                <td>:</td>
+                <td>{animeDetail?.data?.duration}</td>
+              </tr>
+              <tr>
+                <td>Rating</td>
+                <td>:</td>
+                <td>{animeDetail?.data?.rating}</td>
+              </tr>
+              <tr>
+                <td>Score</td>
+                <td>:</td>
+                <td>{animeDetail?.data?.score}</td>
+              </tr>
+              <tr>
+                <td>Studios</td>
+                <td>:</td>
+                <td>
+                  {animeDetail?.data?.studios?.map((i: any) => {
+                    return i.name;
+                  })}
+                </td>
+              </tr>
+              <tr>
+                <td>Genres</td>
+                <td>:</td>
+                <td>
+                  {animeDetail?.data?.genres?.map((i: any) => {
+                    return i.name + ", ";
+                    // let a = [].push(i.name);
+                    // console.log(a)
+                    // return a
+                  })}
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
+      </Modal>
+      <div className="w-72 max-h-screen max-sm:max-h-full pt-20 max-sm:hidden max-sm:overflow-hidden overflow-auto flex">
+        <div className="flex justify-start w-full flex-col space-y-2 max-sm:hidden max-sm:h-full pl-1">
           <ReactSelect
             isClearable
             placeholder="Genre"
@@ -423,8 +374,8 @@ export default function Home() {
           ></ReactSelect>
         </div>
       </div>
-      <div className="flex w-full flex-col max-h-screen space-y-2 max-sm:p-0 pt-5 pb-1">
-        <div className="flex w-full space-x-2">
+      <div className="flex w-full flex-col max-sm:max-h-full max-h-screen space-y-2 max-sm:p-0 pt-5 pb-1">
+        <div className="flex w-full max-sm:hidden space-x-2">
           <div className="flex  pl-4 w-full flex-col space-y-1 justify-center">
             <span className="flex w-full justify-start space-x-1 items-baseline">
               <ReactSelect
@@ -436,53 +387,37 @@ export default function Home() {
                 }}
                 className="w-24"
               ></ReactSelect>
-              <div className="flex w-full justify-end items-baseline space-x-2">
-                <button
-                  className={
-                    animeData?.pagination?.current_page == 1
-                      ? "text-gray-400 pointer-events-none"
-                      : ""
-                  }
-                  onClick={() => setPage(page - 1)}
-                >
-                  previous
-                </button>
-                <button
-                  className={
-                    animeData?.pagination?.current_page == 1
-                      ? "text-gray-400 pointer-events-none"
-                      : ""
-                  }
-                  onClick={() => setPage(1)}
-                >
-                  first
-                </button>
-                <span>{animeData?.pagination?.current_page}</span>
-                <button
-                  className=""
-                  onClick={() =>
-                    setPage(animeData?.pagination?.last_visible_page)
-                  }
-                >
-                  last
-                </button>
-                <button className="" onClick={() => setPage(page + 1)}>
-                  next
-                </button>
-              </div>
             </span>
           </div>
-          <div className="flex w-full bg-w">a</div>
+          <div className="flex w-full max-sm:flex-wrap items-baseline space-x-4 bg-white pr-5">
+            <span>Top</span>
+            <span>Recommendation</span>
+            <span className="flex flex-wrap justify-start">
+              <input
+                type="text"
+                className="border-2 p-1"
+                onChange={(e) => {
+                  setTimeout(() => {
+                    setQuery(e.target.value);
+                  }, 1000);
+                }}
+                placeholder="Search..."
+              />
+            </span>
+          </div>
         </div>
-        <div className="flex w-full max-h-screen overflow-auto flex-wrap flex-row items-stretch justify-center flex-grow space-x-1 space-y-1">
+        <div className="flex cursor-pointer w-full max-sm:max-h-full max-h-screen overflow-auto flex-wrap flex-row items-stretch justify-center flex-grow space-x-1 space-y-1">
           {animeData?.data?.map((i: any) => {
             return (
               <>
-                <span className="relative [&>span]:hover:flex [&>span]:hover:flex-col [&>span]:hover:justify-end">
+                <span
+                  onClick={() => openModalAnimeDetail(i?.mal_id)}
+                  className="relative [&>span]:hover:flex [&>span]:hover:flex-col [&>span]:hover:justify-end"
+                >
                   <img
                     alt={i?.titles[0].title}
                     src={i?.images.jpg.image_url}
-                    className="w-48 flex h-full"
+                    className="w-48 max-sm:w-48 flex h-full"
                   />
                   <span className=" text-center w-full h-full text-white p-1 absolute hidden bg-black bg-opacity-50 left-0 top-0 bottom-0 right-0">
                     {i?.title}
@@ -491,6 +426,38 @@ export default function Home() {
               </>
             );
           })}
+          <div className="flex w-full justify-center py-2 items-baseline space-x-2">
+            <button
+              className={
+                animeData?.pagination?.current_page == 1
+                  ? "text-gray-400 pointer-events-none"
+                  : ""
+              }
+              onClick={() => setPage(page - 1)}
+            >
+              previous
+            </button>
+            <button
+              className={
+                animeData?.pagination?.current_page == 1
+                  ? "text-gray-400 pointer-events-none"
+                  : ""
+              }
+              onClick={() => setPage(1)}
+            >
+              first
+            </button>
+            <span>{animeData?.pagination?.current_page}</span>
+            <button
+              className=""
+              onClick={() => setPage(animeData?.pagination?.last_visible_page)}
+            >
+              last
+            </button>
+            <button className="" onClick={() => setPage(page + 1)}>
+              next
+            </button>
+          </div>
         </div>
       </div>
     </>

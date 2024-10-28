@@ -7,7 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex w-full flex-row max-h-screen">{children}</body>
+      <body className="flex w-full flex-row max-h-screen max-sm:max-h-full">{children}</body>
     </html>
   );
 }
