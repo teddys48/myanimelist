@@ -25,7 +25,7 @@ export default function Home() {
   const [status, setStatus] = useState<string>("");
   const [type, setType] = useState<string>("");
   const [rating, setRating] = useState<string>("");
-  const [sfw, setSfw] = useState<string>("");
+  const [sfw, setSfw] = useState<string>("true");
   const [orderBy, setOrderBy] = useState<string>("");
   const [sort, setSort] = useState<string>("");
   const [score, setScore] = useState<string>("");
@@ -33,6 +33,7 @@ export default function Home() {
   const [minScore, setMinScore] = useState<string>("");
   const [animeDetail, setAnimeDetail] = useState<any>([]);
   const [modalStatus, setmodalStatus] = useState<boolean>(false);
+  const [sidebar, setSidebar] = useState<boolean>(false);
 
   const getAnimeData = async () => {
     await axios
@@ -359,9 +360,183 @@ export default function Home() {
           ></ReactSelect>
         </div>
       </div>
-      <div className="flex w-full flex-col max-sm:max-h-full max-h-screen space-y-2 max-sm:p-0 pt-5 pb-1">
-        <div className="flex w-full max-sm:hidden space-x-2">
-          <div className="flex  pl-4 w-full flex-col space-y-1 justify-center">
+      <div
+        className={
+          sidebar
+            ? "w-72 h-full bg-black z-50 fixed block p-2"
+            : "hidden"
+        }
+      >
+        <div className="flex justify-start w-full flex-col space-y-2 max-sm:h-full max-sm:p-0">
+          <ReactSelect
+            isClearable
+            placeholder="Genre"
+            options={genre}
+            isMulti
+            className="w-full"
+            onChange={(e: any) => {
+              console.log(e);
+              let data = [];
+              for (const element of e) {
+                data.push(element?.value);
+              }
+              console.log("first", data.join());
+              setGenreVal(data.join());
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            placeholder="Type"
+            options={typeValSelect}
+            className="w-full"
+            onChange={(e: any) => {
+              console.log("status", e);
+              if (e) {
+                setType(e?.value);
+              } else {
+                setType("");
+              }
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            placeholder="Status"
+            options={statusValSelect}
+            className="w-full"
+            onChange={(e: any) => {
+              console.log("status", e);
+              if (e) {
+                setStatus(e?.value);
+              } else {
+                setStatus("");
+              }
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            placeholder="Rating"
+            options={ratingValSelect}
+            className="w-full"
+            onChange={(e: any) => {
+              console.log("rating", e);
+              if (e) {
+                setRating(e?.value);
+              } else {
+                setRating("");
+              }
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            placeholder="SFW"
+            options={sfwValSelect}
+            className="w-full"
+            onChange={(e: any) => {
+              console.log("sfw", e);
+              if (e) {
+                setSfw(e?.value);
+              } else {
+                setSfw("");
+              }
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            placeholder="Order By"
+            options={orderValSelect}
+            className="w-full"
+            onChange={(e: any) => {
+              console.log("order", e);
+              if (e) {
+                setOrderBy(e?.value);
+              } else {
+                setOrderBy("");
+              }
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            isDisabled={orderBy ? false : true}
+            placeholder="Sort"
+            options={sortValSelect}
+            className={orderBy ? "w-full" : "w-full pointer-events-none"}
+            onChange={(e: any) => {
+              console.log("order", e);
+              if (!orderBy) {
+                setSort("");
+              }
+              if (e) {
+                setSort(e?.value);
+              } else {
+                setSort("");
+              }
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            placeholder="Score"
+            options={scoreValSelect}
+            className="w-full"
+            onChange={(e: any) => {
+              console.log("score", e);
+              if (e) {
+                setScore(e?.value);
+              } else {
+                setScore("");
+              }
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            placeholder="Min Score"
+            options={scoreValSelect}
+            className="w-full"
+            onChange={(e: any) => {
+              console.log("min score", e);
+              if (e) {
+                setMinScore(e?.value);
+              } else {
+                setMinScore("");
+              }
+            }}
+          ></ReactSelect>
+          <ReactSelect
+            isClearable
+            placeholder="Max Score"
+            options={scoreValSelect}
+            className="w-full"
+            onChange={(e: any) => {
+              console.log("max score", e);
+              if (e) {
+                setMaxScore(e?.value);
+              } else {
+                setMaxScore("");
+              }
+            }}
+          ></ReactSelect>
+        </div>
+      </div>
+      <div className="flex w-full max-sm:space-y-1 flex-col max-sm:max-h-full max-h-screen space-y-2 max-sm:p-0 pt-5 pb-1">
+        <span
+          onClick={() => setSidebar(!sidebar)}
+          className="max-sm:flex px-2 py-1 w-full hidden flex-wrap justify-start"
+        >
+          <i className="fa-solid fa-bars"></i>
+        </span>
+        <span className="max-sm:flex p-1 w-full hidden flex-wrap justify-center">
+          <input
+            type="text"
+            className="border-2 p-1 w-full"
+            onChange={(e) => {
+              setTimeout(() => {
+                setQuery(e.target.value);
+              }, 1000);
+            }}
+            placeholder="Search..."
+          />
+        </span>
+        <div className="flex w-full space-x-2">
+          <div className="flex max-sm:pl-1  pl-4 w-full flex-col space-y-1 justify-center">
             <span className="flex w-full justify-start space-x-1 items-baseline">
               <ReactSelect
                 options={limitValSelect}
@@ -374,10 +549,10 @@ export default function Home() {
               ></ReactSelect>
             </span>
           </div>
-          <div className="flex w-full max-sm:flex-wrap items-baseline space-x-4 bg-white pr-5">
+          <div className="flex w-full max-sm:p-1 max-sm:flex-wrap items-baseline space-x-4 bg-white pr-5">
             <span>Top</span>
             <span>Recommendation</span>
-            <span className="flex flex-wrap justify-start">
+            <span className="flex flex-wrap justify-start max-sm:hidden">
               <input
                 type="text"
                 className="border-2 p-1"
