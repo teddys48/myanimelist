@@ -1,4 +1,3 @@
-import Sidebar from "@/components/sidebar";
 import "./globals.css";
 
 export default function RootLayout({
@@ -8,10 +7,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className="flex w-full flex-row max-h-screen">
-        {/* <Sidebar></Sidebar> */}
-        {children}
-      </body>
+      <body className="flex w-full flex-row max-h-screen">{children}</body>
     </html>
   );
 }
