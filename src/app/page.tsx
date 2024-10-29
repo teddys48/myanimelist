@@ -34,6 +34,12 @@ export default function Home() {
   const [animeDetail, setAnimeDetail] = useState<any>([]);
   const [modalStatus, setmodalStatus] = useState<boolean>(false);
   const [sidebar, setSidebar] = useState<boolean>(false);
+  const [topAnime, setTopAnime] = useState<any>([]);
+  const [topAnimemodalStatus, setTopAnimemodalStatus] =
+    useState<boolean>(false);
+  const [recAnimemodalStatus, setRecAnimemodalStatus] =
+    useState<boolean>(false);
+  const [recAnime, setRecAnime] = useState<any>([]);
 
   const getAnimeData = async () => {
     await axios
@@ -81,6 +87,32 @@ export default function Home() {
       });
   };
 
+  const getTopAnime = async () => {
+    await axios
+      .get(`https://api.jikan.moe/v4/top/anime`)
+      .then((res) => {
+        console.log("cek detail", res.data);
+        setTopAnime(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err);
+      });
+  };
+
+  const getRecAnime = async () => {
+    await axios
+      .get(`https://api.jikan.moe/v4/recommendations/anime`)
+      .then((res) => {
+        console.log("cek detail", res.data);
+        setRecAnime(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert(err);
+      });
+  };
+
   useEffect(() => {
     console.log("cek genreval", genreVal);
     getAnimeData();
@@ -105,111 +137,31 @@ export default function Home() {
   }, []);
 
   const closeModal = () => {
-    setmodalStatus(!modalStatus);
+    setmodalStatus(false);
+    setTopAnimemodalStatus(false);
+    setRecAnimemodalStatus(false);
     setAnimeDetail([]);
+    setTopAnime([]);
+    setRecAnime([]);
   };
-
-  const openAnimeDetailModal = () => {};
 
   const openModalAnimeDetail = async (id: string) => {
     await getAnimeDetail(id);
     setmodalStatus(!modalStatus);
   };
 
+  const openModalTopAnime = async () => {
+    getTopAnime();
+    setTopAnimemodalStatus(!topAnimemodalStatus);
+  };
+
+  const openModalRecAnime = async () => {
+    getRecAnime();
+    setRecAnimemodalStatus(!topAnimemodalStatus);
+  };
+
   return (
     <>
-      <Modal status={modalStatus} title="" closeModal={() => closeModal()}>
-        <div className="flex w-full space-y-10 max-sm:space-y-2 flex-col">
-          <div className="flex w-full flex-row max-md:flex-col space-x-2 ">
-            <div className="flex justify-center h-full w-full">
-              <img
-                className="w-auto"
-                alt={animeDetail?.data?.title}
-                src={animeDetail?.data?.images?.jpg?.large_image_url}
-              />
-            </div>
-            <div className="w-full flex space-y-2 flex-col items-center justify-center">
-              <span className="flex w-full justify-center">
-                {animeDetail?.data?.title}
-              </span>
-              <span className="flex w-full px-2 max-md:p-0 space-y-2 text-justify justify-center">
-                {animeDetail?.data?.synopsis}
-              </span>
-            </div>
-          </div>
-          <div className="flex w-full px-2">
-            <table className="table [&>*]:w-auto w-full  ">
-              <tr>
-                <td>Type</td>
-                <td>:</td>
-                <td>{animeDetail?.data?.type}</td>
-              </tr>
-              <tr>
-                <td>Source</td>
-                <td>:</td>
-                <td>{animeDetail?.data?.source}</td>
-              </tr>
-              <tr>
-                <td>Episodes</td>
-                <td>:</td>
-                <td>{animeDetail?.data?.episodes}</td>
-              </tr>
-              <tr>
-                <td>Status</td>
-                <td>:</td>
-                <td>{animeDetail?.data?.status}</td>
-              </tr>
-              <tr>
-                <td>Aired</td>
-                <td>:</td>
-                <td>
-                  {moment(animeDetail?.data?.aired?.from).format("YYYY-MM-DD")}{" "}
-                  to{" "}
-                  {animeDetail?.data?.aired?.to
-                    ? moment(animeDetail?.data?.aired?.to).format("YYYY-MM-DD")
-                    : "-"}
-                </td>
-              </tr>
-              <tr>
-                <td>Duration</td>
-                <td>:</td>
-                <td>{animeDetail?.data?.duration}</td>
-              </tr>
-              <tr>
-                <td>Rating</td>
-                <td>:</td>
-                <td>{animeDetail?.data?.rating}</td>
-              </tr>
-              <tr>
-                <td>Score</td>
-                <td>:</td>
-                <td>{animeDetail?.data?.score}</td>
-              </tr>
-              <tr>
-                <td>Studios</td>
-                <td>:</td>
-                <td>
-                  {animeDetail?.data?.studios?.map((i: any) => {
-                    return i.name;
-                  })}
-                </td>
-              </tr>
-              <tr>
-                <td>Genres</td>
-                <td>:</td>
-                <td>
-                  {animeDetail?.data?.genres?.map((i: any) => {
-                    return i.name + ", ";
-                    // let a = [].push(i.name);
-                    // console.log(a)
-                    // return a
-                  })}
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
-      </Modal>
       <div className="w-72 max-h-screen max-sm:max-h-full pt-20 max-sm:hidden max-sm:overflow-hidden overflow-auto flex">
         <div className="flex justify-start w-full flex-col space-y-2 max-sm:hidden max-sm:h-full pl-1">
           <ReactSelect
@@ -362,12 +314,16 @@ export default function Home() {
       </div>
       <div
         className={
-          sidebar
-            ? "w-72 h-full bg-black z-50 fixed block p-2"
-            : "hidden"
+          sidebar ? "w-72 h-full bg-white z-50 fixed block p-2" : "hidden"
         }
       >
         <div className="flex justify-start w-full flex-col space-y-2 max-sm:h-full max-sm:p-0">
+          <span
+            onClick={() => setSidebar(!sidebar)}
+            className="max-sm:flex w-full hidden flex-wrap justify-start"
+          >
+            <i className="fa-solid fa-bars"></i>
+          </span>
           <ReactSelect
             isClearable
             placeholder="Genre"
@@ -516,7 +472,7 @@ export default function Home() {
           ></ReactSelect>
         </div>
       </div>
-      <div className="flex w-full max-sm:space-y-1 flex-col max-sm:max-h-full max-h-screen space-y-2 max-sm:p-0 pt-5 pb-1">
+      <div className="flex w-full max-sm:space-y-1 flex-col max-sm:max-h-full max-h-screen space-y-2 max-sm:p-0 pt-0 pb-1">
         <span
           onClick={() => setSidebar(!sidebar)}
           className="max-sm:flex px-2 py-1 w-full hidden flex-wrap justify-start"
@@ -550,12 +506,22 @@ export default function Home() {
             </span>
           </div>
           <div className="flex w-full max-sm:p-1 max-sm:flex-wrap items-baseline space-x-4 bg-white pr-5">
-            <span>Top</span>
-            <span>Recommendation</span>
-            <span className="flex flex-wrap justify-start max-sm:hidden">
+            <span
+              className="cursor-pointer"
+              onClick={() => openModalTopAnime()}
+            >
+              Top
+            </span>
+            <span
+              className="cursor-pointer"
+              onClick={() => openModalRecAnime()}
+            >
+              Recommendation
+            </span>
+            <span className="flex flex-wrap w-full justify-start max-sm:hidden">
               <input
                 type="text"
-                className="border-2 p-1"
+                className="border-2 p-1 w-full"
                 onChange={(e) => {
                   setTimeout(() => {
                     setQuery(e.target.value);
@@ -620,6 +586,180 @@ export default function Home() {
           </div>
         </div>
       </div>
+      <Modal status={modalStatus} title="" closeModal={() => closeModal()}>
+        <div className="flex w-full space-y-10 max-sm:space-y-2 flex-col">
+          <div className="flex h-full max-sm:h-auto w-full flex-row max-md:flex-col space-x-2 ">
+            <div className="flex justify-center h-full w-full">
+              <img
+                className="w-auto"
+                alt={animeDetail?.data?.title}
+                src={animeDetail?.data?.images?.jpg?.large_image_url}
+              />
+            </div>
+            <div className="w-full flex space-y-2 flex-col items-center justify-center">
+              <span className="flex w-full justify-center">
+                {animeDetail?.data?.title}
+              </span>
+              <span className="flex w-full px-2 max-md:p-0 space-y-2 max-sm:h-auto h-full text-justify justify-center">
+                {animeDetail?.data?.synopsis}
+              </span>
+            </div>
+          </div>
+          <div className="flex w-full px-2">
+            <table className="table [&>*]:w-auto w-full  ">
+              <tbody>
+                <tr>
+                  <td>Type</td>
+                  <td>:</td>
+                  <td>{animeDetail?.data?.type}</td>
+                </tr>
+                <tr>
+                  <td>Source</td>
+                  <td>:</td>
+                  <td>{animeDetail?.data?.source}</td>
+                </tr>
+                <tr>
+                  <td>Episodes</td>
+                  <td>:</td>
+                  <td>{animeDetail?.data?.episodes}</td>
+                </tr>
+                <tr>
+                  <td>Status</td>
+                  <td>:</td>
+                  <td>{animeDetail?.data?.status}</td>
+                </tr>
+                <tr>
+                  <td>Aired</td>
+                  <td>:</td>
+                  <td>
+                    {moment(animeDetail?.data?.aired?.from).format(
+                      "YYYY-MM-DD"
+                    )}{" "}
+                    to{" "}
+                    {animeDetail?.data?.aired?.to
+                      ? moment(animeDetail?.data?.aired?.to).format(
+                          "YYYY-MM-DD"
+                        )
+                      : "-"}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Duration</td>
+                  <td>:</td>
+                  <td>{animeDetail?.data?.duration}</td>
+                </tr>
+                <tr>
+                  <td>Rating</td>
+                  <td>:</td>
+                  <td>{animeDetail?.data?.rating}</td>
+                </tr>
+                <tr>
+                  <td>Score</td>
+                  <td>:</td>
+                  <td>{animeDetail?.data?.score}</td>
+                </tr>
+                <tr>
+                  <td>Studios</td>
+                  <td>:</td>
+                  <td>
+                    {animeDetail?.data?.studios?.map((i: any) => {
+                      return i.name;
+                    })}
+                  </td>
+                </tr>
+                <tr>
+                  <td>Genres</td>
+                  <td>:</td>
+                  <td>
+                    {animeDetail?.data?.genres?.map((i: any) => {
+                      return i.name + ", ";
+                      // let a = [].push(i.name);
+                      // console.log(a)
+                      // return a
+                    })}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </Modal>
+      <Modal
+        status={topAnimemodalStatus}
+        title=""
+        closeModal={() => closeModal()}
+      >
+        <div className="flex w-full">
+          <table className="table w-full [&>*]:w-full [&>*]:h-full">
+            <tbody className="w-full"></tbody>
+            {topAnime?.data?.map((i: any) => {
+              return (
+                <>
+                  <tr>
+                    <td>
+                      <img src={i?.images?.jpg?.image_url} />{" "}
+                    </td>
+                    <td className="flex flex-col justify-center">
+                      <span>{i?.title}</span>
+                      <span>{i?.year}</span>
+                      <span>{i?.score}</span>
+                      <span>
+                        {i?.genres?.map((v: any) => {
+                          return v.name + ", ";
+                          // let a = [].push(i.name);
+                          // console.log(a)
+                          // return a
+                        })}
+                      </span>
+                    </td>
+                  </tr>
+                </>
+              );
+            })}
+          </table>
+        </div>
+      </Modal>
+      <Modal
+        status={recAnimemodalStatus}
+        title=""
+        closeModal={() => closeModal()}
+      >
+        <div className="flex w-full flex-col space-y-10">
+          {recAnime?.data?.map((val: any) => {
+            return (
+              <>
+                <div className="w-full flex flex-row max-sm:flex-col border-2 p-1">
+                  {/* {val?.entry?.map((i: any) => {
+                    return (
+                      <>
+                        <div className="w-full">
+                          <span>
+                            <img src={i?.images?.jpg?.small_image_url} />
+                          </span>
+                        </div>
+                      </>
+                    );
+                  })} */}
+                  <div className="w-full flex flex-col">
+                    <span>If you like this</span>
+                    <span className="flex w-full flex-row space-x-2 max-sm:flex-nowrap ">
+                      <img className="max-sm:w-28" src={val?.entry[0]?.images?.jpg?.image_url} />
+                      <span className="flex items-center">{val?.entry[0]?.title}</span>
+                    </span>
+                  </div>
+                  <div className="w-full flex flex-col">
+                    <span>you might be like this</span>
+                    <span className="flex w-full flex-row space-x-2 max-sm:flex-nowrap ">
+                      <img className="max-sm:w-28" src={val?.entry[1]?.images?.jpg?.image_url} />
+                      <span className="flex items-center">{val?.entry[1]?.title}</span>
+                    </span>
+                  </div>
+                </div>
+              </>
+            );
+          })}
+        </div>
+      </Modal>
     </>
   );
 }
